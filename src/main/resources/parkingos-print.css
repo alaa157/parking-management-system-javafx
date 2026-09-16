@@ -1,0 +1,54 @@
+/* AUTO-GENERATED FROM DesignTokens.java — DO NOT EDIT BY HAND. Run `mvn generate-resources` to regenerate. */
+/* Print-friendly companion stylesheet for exported/printed reports.
+   Phase 5: full print system — chrome hidden, tables/totals/page-breaks tuned for paper. */
+@media print {
+    /* --- 1. Hide all interactive chrome -------------------------------- */
+    .sidebar, .nav-button, .nav-button-active, .ghost-button, .outline-button,
+    .primary-button, .danger-button, .icon-button, .icon-button-card,
+    .action-button-gradient, .notification-panel, .toast-card, .toast-stack,
+    .report-controls, .command-palette, .hamburger-button, .sidebar-collapse,
+    .notification-clear, .notification-link, .skip-link, .chart-tooltip,
+    .skeleton-overlay, .phase6-modal-overlay, .modal-layer, .avatar-camera,
+    .segmented-control, .segmented-role, .toggle-row {
+        display: none;
+    }
+
+    /* --- 2. Paper canvas: white, ink-black, readable type ---------------- */
+    .page-root, .analytics-host, .analytics-chart-card, .analytics-table,
+    .ticket-shell, .ticket-panel, .ticket-detail-card, .card, .settings-card,
+    .settings-content, .user-table, .detail-panel, .fee-box {
+        -fx-background-color: #FFFFFF;
+        -fx-text-fill: #000000;
+        -fx-border-color: #CBD5E1;
+        -fx-effect: null;
+    }
+    .analytics-table .table-cell, .analytics-table .column-header,
+    .analytics-table .column-header .label,
+    .user-table .table-cell, .user-table .table-row-cell,
+    .user-table .table-row-cell .text {
+        -fx-text-fill: #000000;
+        -fx-background-color: #FFFFFF;
+    }
+    .type-display, .type-h1, .type-h2 { -fx-text-fill: #000000; }
+    .type-body, .type-caption, .type-micro { -fx-text-fill: #000000; }
+
+    /* --- 3. Tables built for paper: header repeats, rows never split ---- */
+    .analytics-table .column-header-background,
+    .user-table .column-header-background {
+        -fx-background-color: #F1F5F9;
+    }
+    .analytics-table .table-row-cell,
+    .user-table .table-row-cell {
+        -fx-border-color: transparent transparent #CBD5E1 transparent;
+        -fx-cell-size: 28px;
+    }
+    .analytics-table .table-row-cell:filled:nth-row(even),
+    .user-table .table-row-cell:filled:nth-row(even) {
+        -fx-background-color: #FFFFFF;
+    }
+
+    /* --- 4. Charts degrade to labeled totals on paper ------------------- */
+    .premium-bar-chart, .chart-bar-hot, .sparkline {
+        -fx-effect: null;
+    }
+}
