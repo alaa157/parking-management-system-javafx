@@ -1,0 +1,40 @@
+# Maven
+target/
+
+# Local project tooling and generated metadata
+.superpowers/
+codebase.xml
+
+# Java
+*.class
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local application data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Local environment files
+.env
+.env.*
+!.env.example
