@@ -27,7 +27,7 @@ required.
 ## Quick start
 
 ```bash
-git clone <private-repository-url>
+git clone git@github.com:alaa157/parking-management-system-javafx.git
 cd parking-management-system-javafx
 mvn javafx:run
 ```
