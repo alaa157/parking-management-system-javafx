@@ -1,0 +1,26 @@
+# ParkingOS attendant duty flow — source of truth, rendered by scripts/render_diagrams.sh
+shape: sequence_diagram
+
+attendant: "Attendant" {
+  shape: person
+}
+duty: DutyService
+parking: ParkingService
+payments: PaymentService
+notify: NotificationService
+store: PersistenceStore
+
+attendant -> duty: "start(shift, zone)"
+duty -> store: "reject if OPEN session exists"
+duty -> store: "saveDutySession(OPEN)"
+duty -> notify: "'Duty started …'"
+
+attendant -> parking: "entry / exit / reservations (garage-authorized ops)"
+attendant -> payments: "processPayment (paymentTime attributed)"
+
+attendant -> duty: "end()"
+duty -> store: "updateDutySessionEnd(CLOSED)"
+duty -> notify: "'Duty ended … on duty for <Duration>'"
+attendant -> duty: "summary(from, to) [admin]"
+duty -> store: "overlap sessions + COMPLETED payments in window"
+duty -> attendant: "DutySummary(transactions, revenue, total)"

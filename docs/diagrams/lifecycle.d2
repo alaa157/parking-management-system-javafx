@@ -1,0 +1,39 @@
+# ParkingOS lifecycle state machines — source of truth, rendered by scripts/render_diagrams.sh
+direction: right
+grid-columns: 2
+
+ticket: "TicketStatus (TicketStatus.java:22 isValidTransition)" {
+  CREATED -> ACTIVE: "parkVehicle / claimForEntry"
+  CREATED -> CANCELLED: cancelTicket
+  ACTIVE -> AWAITING_PAYMENT: markAwaitingPayment
+  ACTIVE -> CANCELLED: cancelTicket
+  AWAITING_PAYMENT -> PAID: "Ticket.processPayment"
+  PAID -> CLOSED: closeTicket
+  PAID -> REFUNDED: refundPayment
+  CLOSED -> REFUNDED: refundPayment
+}
+
+reservation: "ReservationStatus (ReservationService.java)" {
+  HOLD_REQUESTED -> ACTIVE: "reserve (spot AVAILABLE→RESERVED)"
+  ACTIVE -> CLAIMED: "claimForEntry → vehicleEntry"
+  ACTIVE -> CANCELLED: cancel
+  ACTIVE -> EXPIRED: "expire / lazy expiry"
+}
+
+spot: "SpotStatus (ParkingSpot.java)" {
+  AVAILABLE -> OCCUPIED: "occupySpot (allocateSpot)"
+  AVAILABLE -> RESERVED: "reserveSpot"
+  RESERVED -> AVAILABLE: "clearReservation (cancel/expire/claim)"
+  OCCUPIED -> AVAILABLE: "freeSpot (releaseAfterPayment)"
+  AVAILABLE -> UNDER_MAINTENANCE: setUnderMaintenance
+  UNDER_MAINTENANCE -> AVAILABLE: removeFromMaintenance
+  AVAILABLE -> OUT_OF_SERVICE: setOutOfService
+  OUT_OF_SERVICE -> AVAILABLE: restoreToAvailable
+}
+
+payment: "PaymentStatus (Payment.java / PaymentService.java)" {
+  CREATED -> PENDING: "new Payment(...)"
+  PENDING -> COMPLETED: "processPayment (in-tx)"
+  PENDING -> FAILED: "gateway error / declined"
+  COMPLETED -> REFUNDED: "refundPayment (≤14 days, full amount)"
+}

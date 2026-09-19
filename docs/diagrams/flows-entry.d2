@@ -1,0 +1,20 @@
+# ParkingOS vehicle entry flow — source of truth, rendered by scripts/render_diagrams.sh
+shape: sequence_diagram
+
+actor: "Actor (Admin/Attendant/Customer)" {
+  shape: person
+}
+parking: ParkingService
+store: PersistenceStore
+spot: ParkingSpot
+tickets: TicketService
+
+actor -> parking: "vehicleEntry(vehicle, garageId)"
+parking -> parking: "requireOperationalActor + garage access"
+parking -> store: "findActiveTicketForVehicle()"
+store --> parking: "none (else VehicleAlreadyParked)"
+parking -> parking: "findAvailableSpot() + clear expired holds"
+parking -> spot: "occupySpot() (AVAILABLE→OCCUPIED)"
+parking -> tickets: "createTicket() → CREATED"
+tickets -> store: "saveTicket + audit"
+parking -> tickets: "updateTicketStatus(ACTIVE)"

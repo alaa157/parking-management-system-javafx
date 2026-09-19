@@ -65,7 +65,7 @@ Diagrams are GENERATED from checked-in text sources — never hand-drawn binarie
 
 ## 2. Phase B — Behavior (parallel, after A2)
 
-### B1. `docs/LIFECYCLE.md` (state machines) — [ ] todo
+### B1. `docs/LIFECYCLE.md` (state machines) — [x] done (2026-09-19)
 
 - Inputs: `enums/TicketStatus,ReservationStatus,SpotStatus,PaymentStatus`,
   `exceptions/*`, `TicketServiceTest`, `ReservationServiceTest`.
@@ -74,7 +74,7 @@ Diagrams are GENERATED from checked-in text sources — never hand-drawn binarie
   `VehicleAlreadyParkedException`).
 - Verify: every enum value appears in a diagram.
 
-### B2. `docs/FLOWS.md` (sequences) — [ ] todo
+### B2. `docs/FLOWS.md` (sequences) — [x] done (2026-09-19)
 
 - Output: 4 mermaid `sequenceDiagram`:
   1. vehicle entry → ticket,
@@ -83,7 +83,7 @@ Diagrams are GENERATED from checked-in text sources — never hand-drawn binarie
   4. attendant duty start → operations → shift summary.
 - Verify: each step names the service method actually called.
 
-### B3. `docs/AUTHORIZATION.md` — [ ] todo
+### B3. `docs/AUTHORIZATION.md` — [x] done (2026-09-19)
 
 - Inputs: `security/*`, `services/GarageContext`, `services/GarageService`,
   `model/GarageAccess`, `model/UserRole`,
@@ -96,7 +96,7 @@ Diagrams are GENERATED from checked-in text sources — never hand-drawn binarie
 
 ## 3. Phase C — Operations & Use (parallel, after B)
 
-### C1. `docs/OPERATIONS.md` (runbook) — [ ] todo
+### C1. `docs/OPERATIONS.md` (runbook) — [x] done (2026-09-19)
 
 - Inputs: `README.md` (data & backups section), `AppConfig`, migration code.
 - Output: DB path (`parkingos.database` → `~/.parkingos/parking.db`),
@@ -104,7 +104,7 @@ Diagrams are GENERATED from checked-in text sources — never hand-drawn binarie
   migration-failure-aborts-startup procedure, restore checklist.
 - Verify: commands are copy-pasteable.
 
-### C2. `docs/USER_GUIDES.md` — [ ] todo
+### C2. `docs/USER_GUIDES.md` — [x] done (2026-09-19)
 
 - Inputs: `gui/LoginView, RegistrationView, FirstRunSetupView, DashboardView,
   Garage*View, TicketPaymentView, WalletView, DutyView, OccupancyMapView,
@@ -113,7 +113,7 @@ Diagrams are GENERATED from checked-in text sources — never hand-drawn binarie
   first-run admin setup + `parkingos.demo=true` note.
 - Verify: every `*View` file referenced at least once.
 
-### C3. `docs/TESTING.md` + `CONTRIBUTING.md` — [ ] todo
+### C3. `docs/TESTING.md` + `CONTRIBUTING.md` — [x] done (2026-09-19)
 
 - Inputs: `src/test/**` layout, `pom.xml` (surefire/javafx plugins),
   `scripts/generate_palette_css.py`, `docs/theming.md`.
@@ -122,7 +122,7 @@ Diagrams are GENERATED from checked-in text sources — never hand-drawn binarie
   token-CSS no-hand-edit rule.
 - Verify: commands match `pom.xml`.
 
-### C4. `docs/ADRs.md` (5 records) — [ ] todo
+### C4. `docs/ADRs.md` (5 records) — [x] done (2026-09-19)
 
 - Format per ADR: Status / Context / Decision / Consequences.
 - Topics:

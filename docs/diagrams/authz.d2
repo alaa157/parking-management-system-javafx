@@ -1,0 +1,40 @@
+# ParkingOS operational-access decision — source of truth, rendered by scripts/render_diagrams.sh
+direction: down
+
+request: "Operation on garage G by user U" {
+  shape: diamond
+}
+inactive: "DENY" {
+  shape: oval
+  style.fill: "#FF4757"
+}
+archived: "DENY (archived)" {
+  shape: oval
+  style.fill: "#FF4757"
+}
+admin: "U.role == ADMIN?" {
+  shape: diamond
+}
+allow_admin: "ALLOW (global admin bypass)" {
+  shape: oval
+  style.fill: "#2ED573"
+}
+access: "GarageAccess(U, G) active?" {
+  shape: diamond
+}
+allow: "ALLOW" {
+  shape: oval
+  style.fill: "#2ED573"
+}
+deny: "DENY → GarageAccessException" {
+  shape: oval
+  style.fill: "#FF4757"
+}
+
+request -> inactive: "U null / !isActive"
+request -> archived: "G missing / archived"
+request -> admin: "active user, open garage"
+admin -> allow_admin: "yes"
+admin -> access: "no (Attendant/Customer)"
+access -> allow: "row exists + active"
+access -> deny: "otherwise"

@@ -1,0 +1,23 @@
+# ParkingOS reservation hold/claim/expiry flow — source of truth, rendered by scripts/render_diagrams.sh
+shape: sequence_diagram
+
+actor: "Actor" {
+  shape: person
+}
+reservations: ReservationService
+parking: ParkingService
+store: PersistenceStore
+
+actor -> reservations: "reserve(spotId)"
+reservations -> reservations: "expireSingleIfElapsed + availability guards"
+reservations -> store: "spot RESERVED + saveReservation(ACTIVE)"
+reservations -> actor: "ENTRY_EXIT 'confirmed, expires at …'"
+
+actor -> reservations: "claimForEntry(reservationId)"
+reservations -> reservations: "holder check + now < expiresAt"
+reservations -> store: "CLAIMED + spot.clearReservation()"
+parking -> parking: "vehicleEntry(reservationId): allocateSpot → OCCUPIED"
+parking -> store: "createTicket → ACTIVE (one tx)"
+
+actor -> reservations: "cancel() → CANCELLED + clearHold"
+reservations -> reservations: "expire(now) sweeps elapsed → EXPIRED"

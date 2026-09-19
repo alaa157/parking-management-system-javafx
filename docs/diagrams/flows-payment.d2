@@ -1,0 +1,24 @@
+# ParkingOS payment-to-exit flow — source of truth, rendered by scripts/render_diagrams.sh
+shape: sequence_diagram
+
+actor: "Actor" {
+  shape: person
+}
+parking: ParkingService
+tickets: TicketService
+payments: PaymentService
+notify: NotificationService
+store: PersistenceStore
+
+actor -> parking: "vehicleExit(ticket)"
+parking -> tickets: "markAwaitingPayment() (ACTIVE→AWAITING_PAYMENT)"
+actor -> payments: "processPayment(ticket, payment)"
+payments -> payments: "validateCard/Wallet/Cash + fee calc"
+payments -> store: "inTransaction {"
+tickets -> tickets: "Ticket.processPayment (→PAID)"
+payments -> payments: "payment COMPLETED, savePayment"
+tickets -> tickets: "closeTicket (PAID→CLOSED)"
+parking -> parking: "releaseAfterPayment (spot OCCUPIED→AVAILABLE)"
+notify -> actor: "PAYMENT_SUCCESS notification"
+payments -> store: "} commit + audit(PAYMENT_COMPLETED)"
+payments -> payments: "generateReceipt()"
