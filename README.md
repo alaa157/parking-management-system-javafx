@@ -8,6 +8,8 @@
 
 ParkingOS runs multi-garage parking from one desktop app. You manage garages, park vehicles, collect cash, card, and wallet payments, hold spots with reservations, and report on revenue. Java 21 and JavaFX drive the interface; an embedded SQLite database with versioned migrations stores everything.
 
+> Capstone project — Digital Egypt Pioneers Initiative (DEPI), mentored by Mina Yonan. Team: Alaa Adel (lead, backend and architecture), Ebrahim Sadek (JavaFX UI and theming), Mahmoud Hewidy (database and persistence), Mohamed Hemdan (QA, testing, documentation). Defense package: `docs/capstone/` (proposal, SRS, SDS, test plan, user manual, final report, slides).
+
 ![ParkingOS container diagram](docs/diagrams/architecture.svg)
 
 ## What each role gets
@@ -84,6 +86,7 @@ Default pricing: 10% tax, 5.0 base hourly rate, 5 minute reservation holds, 48 h
 | `docs/CONTRIBUTING.md` | Boundaries, theming contract, and workflow |
 | `docs/ADRs.md` | Architecture decision records |
 | `CONTEXT.md` | Ubiquitous language for garages, access, and tickets |
+| `docs/capstone/` | Defense package: proposal, SRS, SDS, test plan, manual, final report, slides |
 
 Diagrams are D2 sources in `docs/diagrams/` with rendered SVGs. Regenerate them with `scripts/render_diagrams.sh` after editing a `.d2` file. Shared agent skills live in `.agents/skills/`.
 
