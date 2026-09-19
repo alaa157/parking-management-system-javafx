@@ -1,0 +1,113 @@
+# ParkingOS ERD — source of truth, rendered by scripts/render_diagrams.sh
+direction: right
+
+title: ParkingOS — Entity Relationship Diagram (SQLite schema v11) {
+  style.font-size: 24
+}
+
+users: {
+  shape: sql_table
+  user_id: {constraint: primary_key}
+  username: "UNIQUE"
+  email: "UNIQUE"
+  password_hash: ""
+  role: "CUSTOMER|ADMIN|ATTENDANT"
+  wallet_balance: ""
+}
+
+garages: {
+  shape: sql_table
+  garage_id: {constraint: primary_key}
+  name: ""
+  is_open: ""
+  archived: ""
+  base_hourly_rate: ""
+}
+
+user_garages: {
+  shape: sql_table
+  access_id: {constraint: primary_key}
+  user_id: {constraint: foreign_key}
+  garage_id: {constraint: foreign_key}
+  access_role: ""
+  active: ""
+}
+
+vehicles: {
+  shape: sql_table
+  vehicle_id: {constraint: primary_key}
+  license_plate: "UNIQUE"
+  owner_id: {constraint: foreign_key}
+  parking_spot_id: ""
+  is_parked: ""
+}
+
+parking_spots: {
+  shape: sql_table
+  spot_id: {constraint: primary_key}
+  garage_id: ""
+  status: ""
+  vehicle_id: {constraint: foreign_key}
+  reservation_holder: {constraint: foreign_key}
+}
+
+tickets: {
+  shape: sql_table
+  ticket_id: {constraint: primary_key}
+  vehicle_id: {constraint: foreign_key}
+  owner_id: {constraint: foreign_key}
+  spot_id: {constraint: foreign_key}
+  garage_id: {constraint: foreign_key}
+  payment_id: {constraint: foreign_key}
+  status: ""
+}
+
+payments: {
+  shape: sql_table
+  payment_id: {constraint: primary_key}
+  ticket_id: {constraint: foreign_key}
+  customer_id: {constraint: foreign_key}
+  garage_id: {constraint: foreign_key}
+  status: ""
+  payment_method: "CASH|CARD|WALLET"
+}
+
+reservations: {
+  shape: sql_table
+  reservation_id: {constraint: primary_key}
+  user_id: {constraint: foreign_key}
+  spot_id: {constraint: foreign_key}
+  status: "ACTIVE|CLAIMED|CANCELLED|EXPIRED"
+}
+
+duty_sessions: {
+  shape: sql_table
+  session_id: {constraint: primary_key}
+  attendant_id: {constraint: foreign_key}
+  status: "OPEN|CLOSED"
+}
+
+notifications: {
+  shape: sql_table
+  notification_id: {constraint: primary_key}
+  recipient_id: ""
+  type: ""
+  unread: ""
+}
+
+users.user_id -> user_garages.user_id: "1—N"
+garages.garage_id -> user_garages.garage_id: "1—N"
+users.user_id -> vehicles.owner_id: "1—N"
+garages.garage_id -> parking_spots.garage_id: "1—N"
+vehicles.vehicle_id -> parking_spots.vehicle_id: "0/1"
+vehicles.vehicle_id -> tickets.vehicle_id: "1—N"
+users.user_id -> tickets.owner_id: "1—N"
+parking_spots.spot_id -> tickets.spot_id: "1—N"
+garages.garage_id -> tickets.garage_id: "1—N (owns)"
+tickets.ticket_id -> payments.ticket_id: "1—0/1"
+users.user_id -> payments.customer_id: "1—N"
+garages.garage_id -> payments.garage_id: "1—N"
+users.user_id -> reservations.user_id: "1—N"
+parking_spots.spot_id -> reservations.spot_id: "1—N"
+users.user_id -> duty_sessions.attendant_id: "1—N"
+users.user_id -> notifications.recipient_id: "1—N"

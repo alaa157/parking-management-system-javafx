@@ -1,0 +1,68 @@
+# ParkingOS container diagram — source of truth, rendered by scripts/render_diagrams.sh
+direction: down
+
+title: ParkingOS (Java 21 / JavaFX / SQLite) — Container View {
+  style.font-size: 28
+}
+
+user: Operator (Admin / Attendant / Customer) {
+  shape: person
+}
+
+javafx: "JavaFX runtime" {
+  shape: rectangle
+}
+
+gui: "GUI layer — com.parking.gui" {
+  app: "ParkingApplication\n(entry, navigation, shell wiring)"
+  shell: "AppShell + AppServices\n(boot, sidebar/header, PageFactory)"
+  views: "Views (16 screens)\nLogin / Dashboard / OccupancyMap\nTicketPayment / Wallet / Duty\nGarageManagement / Analytics / ..."
+  tasks: "BackgroundTaskRunner\nToastManager\nNotificationCenter"
+}
+
+services: "Service layer — com.parking.services" {
+  parking: "ParkingService\nentry / exit / spots"
+  ticket: "TicketService\nlifecycle / durations"
+  payment: "PaymentService\nfees / processing / refunds"
+  reservation: "ReservationService\nholds / claim / expiry"
+  garage: "GarageService + GarageContext\nlifecycle / access / selection"
+  duty: "DutyService\nsessions / summaries"
+  notify: "NotificationService\npersisted events"
+  ops: "OperationsSnapshotService\nScheduledReportService\nReportExporter"
+}
+
+domain: "Domain — com.parking.model" {
+  shape: rectangle
+  label: "Domain — com.parking.model + enums + exceptions\nTicket · Payment(+Card/Cash/Wallet) · Vehicle · ParkingSpot\nGarage(+Access) · Reservation · DutySession · User(Admin/Attendant/Customer)"
+}
+
+security: "Cross-cutting" {
+  shape: rectangle
+  label: "Cross-cutting — security / config / util\nPasswordHasher · LocalCardAuthorizationProvider\nAppConfig (settings.properties) · Money"
+}
+
+store: "Persistence — PersistenceStore (SQLite)" {
+  shape: cylinder
+  label: "PersistenceStore — SQLite (schema v11, WAL)\nusers · garages · user_garages · vehicles\nparking_spots · tickets · payments\nreservations · duty_sessions · notifications"
+}
+
+dbfile: "~/.parkingos/parking.db\n(-Dparkingos.database override)" {
+  shape: rectangle
+}
+
+user -> javafx: launches
+javafx -> gui.app: hosts
+gui.app -> gui.shell: boots via AppServices
+gui.shell -> gui.views: navigates (role-based)
+gui.shell -> gui.tasks: overlays / jobs
+gui.views -> services: calls (actor + garageId)
+services.parking -> services.ticket
+services.parking -> services.reservation
+services.payment -> services.notify
+services.garage -> services.duty
+services.ops -> services.parking
+services.ops -> services.payment
+services -> domain: operates on
+services -> store: JDBC (FK=ON, busy_timeout)
+services -> security: authN/Z, fees, card auth
+store -> dbfile: reads / writes
