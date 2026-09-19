@@ -57,7 +57,8 @@ sqlite3 "$HOME/.parkingos/parking.db" ".backup '$HOME/.parkingos/parking.db.back
 ```
 
 Startup migrations are versioned and validated. A failed migration aborts
-startup instead of deleting or resetting application data.
+startup instead of deleting or resetting application data. See
+`docs/OPERATIONS.md` for the full backup/restore runbook.
 
 ## Project structure
 
@@ -80,6 +81,25 @@ reservations, tickets, payments, and notifications consistent. Notifications
 are persisted and recipient-scoped rather than simulated in the UI. See
 `CONTEXT.md` and `docs/` for the domain model, design notes, and supporting
 project artifacts.
+
+## Documentation
+
+| Doc | Contents |
+|---|---|
+| `docs/ARCHITECTURE.md` | Container view, startup sequence, service catalog, persistence |
+| `docs/DATA_MODEL.md` | ER diagram, ownership rules, schema v11 tables |
+| `docs/LIFECYCLE.md` | Ticket/reservation/spot/payment state machines |
+| `docs/FLOWS.md` | Entry, payment-to-exit, reservation, duty sequences |
+| `docs/AUTHORIZATION.md` | Operational-access decision and per-service enforcement |
+| `docs/OPERATIONS.md` | Deploy, backup/restore, migrations, troubleshooting |
+| `docs/USER_GUIDES.md` | Customer, attendant, and administrator click-paths |
+| `docs/TESTING.md` | Test tiers, commands, and conventions |
+| `docs/CONTRIBUTING.md` | Boundaries, theming contract, and workflow |
+| `docs/ADRs.md` | Architecture decision records |
+
+Diagrams are D2 sources in `docs/diagrams/` with rendered SVGs; regenerate
+with `scripts/render_diagrams.sh` (requires `d2`). Shared agent skills live in
+`.agents/skills/` (see `.agents/skills/SOURCES.md`).
 
 ## Security notes
 
