@@ -6,34 +6,30 @@
 ![SQLite](https://img.shields.io/badge/SQLite-WAL-green)
 ![Maven](https://img.shields.io/badge/Build-Maven-orange)
 
-Multi-garage parking management for the desktop. ParkingOS gives
-**administrators**, **attendants**, and **customers** one workflow for garage
-operations, vehicle entry, ticketing, payments, reservations, notifications,
-and operational reporting — backed by an embedded SQLite store with versioned
-migrations.
+ParkingOS runs multi-garage parking from one desktop app. You manage garages, park vehicles, collect cash, card, and wallet payments, hold spots with reservations, and report on revenue. Java 21 and JavaFX drive the interface; an embedded SQLite database with versioned migrations stores everything.
 
-## Features
+![ParkingOS container diagram](docs/diagrams/architecture.svg)
 
-- **Role-aware shell** — dedicated navigation for administrators, attendants,
-  and customers, with global search (`Ctrl/Cmd+K`) and per-garage scope picker.
-- **Multi-garage operations** — each garage owns its capacity, tickets,
-  payments, reservations, and reports; per-user garage access with an archived
-  state for historical facilities.
-- **Ticket lifecycle** — vehicle entry with spot allocation, exit with fee
-  calculation, bulk updates, cancellations, and refunds.
-- **Payments** — cash, card, and wallet flows with receipts, tax handling, and
-  persisted `PAYMENT_SUCCESS` notifications.
-- **Reservations** — time-boxed spot holds with atomic claim-and-park and lazy
-  expiry sweeps.
-- **Attendant duty** — duty sessions with shift summaries attributing
-  transactions and revenue.
-- **Reporting** — operations snapshots, revenue analytics, scheduled reports,
-  and branded PDF/CSV export.
+## What each role gets
 
-## Quick start
+| Capability | Customer | Attendant | Admin |
+|---|---|---|---|
+| Register and manage vehicles | Yes | No | No |
+| Park and reserve spots | Own vehicles | Any vehicle in scope | Any vehicle in scope |
+| Pay and exit | Own tickets | Yes | Yes |
+| Wallet top-up | Yes | No | No |
+| Duty sessions and shift handoff | No | Yes | View |
+| User management | No | No | Yes |
+| Garage lifecycle and access grants | No | No | Yes |
+| Revenue analytics and scheduled reports | No | No | Yes |
+| Refunds (full amount, within 14 days) | No | No | Yes |
+| Maintenance and parking configuration | No | Spots only | Yes |
 
-Requirements: **JDK 21+**, **Maven 3.9+**. JavaFX resolves via Maven — no
-separate install needed.
+You pick your active garage in the header. Admins also get an **All garages** scope. The full access rules live in `docs/AUTHORIZATION.md`.
+
+## Run it in 5 minutes
+
+You need JDK 21 or newer and Maven 3.9 or newer.
 
 ```bash
 git clone git@github.com:alaa157/parking-management-system-javafx.git
@@ -41,44 +37,39 @@ cd parking-management-system-javafx
 mvn javafx:run
 ```
 
-First launch with an empty database opens the administrator setup screen.
-For local development with demo fixtures:
+The first launch opens the administrator setup screen because the database holds no users. Create the admin account, then sign in.
+
+For local development with demo fixtures, run this instead:
 
 ```bash
 mvn -Dparkingos.demo=true javafx:run
 ```
 
-## Configuration
+## Park and charge a vehicle
+
+This run-through shows the core loop. Each step names the screen from the sidebar.
+
+1. Add a vehicle under **My Vehicles** and save it.
+2. Open **Active Parking**, pick a level tab, and select an available tile.
+3. Choose **Park Here**, pick the vehicle, and confirm **Park Vehicle**. The app creates an `ACTIVE` ticket.
+4. Open **Tickets**, select the ticket, and choose **Exit**. The ticket moves to `AWAITING_PAYMENT` with the fee calculated.
+5. Pick the **CARD**, **CASH**, or **WALLET** tab and choose **Pay**. The ticket closes, the spot frees, and the customer keeps a receipt.
+
+Reservations follow the same shape: hold a spot, claim it at entry, and the ticket starts automatically. Expiry sweeps run on every spot search, so no timer process is required. `docs/LIFECYCLE.md` maps the state machines behind these flows.
+
+## Configure it
 
 | Property | Default | Purpose |
 |---|---|---|
 | `parkingos.database` | `~/.parkingos/parking.db` | SQLite database path |
 | `parkingos.settings.file` | `~/.parkingos/settings.properties` | Rates, tax, holds, currency |
-| `parkingos.reports.directory` | app default | Report export directory |
+| `parkingos.reports.directory` | App default | Report export directory |
 | `parkingos.demo` | `false` | Seed demo users and fixtures |
-| `parkingos.reduceMotion` | `false` | Disable UI animations |
+| `parkingos.reduceMotion` | `false` | Turn off UI animations |
 
-## Project structure
+Default pricing: 10% tax, 5.0 base hourly rate, 5 minute reservation holds, 48 hour maximum stay, USD. Change these under **Settings** and **Parking Config** as an admin.
 
-```text
-src/main/java/com/parking/
-├── config/       Application configuration and persistence setup
-├── gui/          JavaFX views, shell, theming, and navigation
-├── model/        Domain entities and payment implementations
-├── enums/        Ticket, payment, spot, and reservation states
-├── exceptions/   Domain and authorization failures
-├── security/     Authentication and access-control helpers
-├── services/     Garage, ticket, payment, reservation, duty, reporting use cases
-├── persistence/  SQLite store, schema versions, and migrations
-└── util/         Shared helpers (money, formatting)
-
-src/main/resources/   CSS themes (generated), icons
-src/test/java/        Unit, service, persistence, and UI characterization tests
-docs/                 Guides, records, and generated diagrams
-.agents/skills/       Shared AI-agent skills
-```
-
-## Documentation
+## Learn the system
 
 | Doc | Contents |
 |---|---|
@@ -87,47 +78,58 @@ docs/                 Guides, records, and generated diagrams
 | `docs/LIFECYCLE.md` | Ticket, reservation, spot, and payment state machines |
 | `docs/FLOWS.md` | Entry, payment-to-exit, reservation, and duty sequences |
 | `docs/AUTHORIZATION.md` | Operational-access decision and per-service enforcement |
-| `docs/OPERATIONS.md` | Deploy, backup/restore, migrations, troubleshooting |
+| `docs/OPERATIONS.md` | Deploy, backup and restore, migrations, troubleshooting |
 | `docs/USER_GUIDES.md` | Customer, attendant, and administrator click-paths |
 | `docs/TESTING.md` | Test tiers, commands, and conventions |
 | `docs/CONTRIBUTING.md` | Boundaries, theming contract, and workflow |
 | `docs/ADRs.md` | Architecture decision records |
 | `CONTEXT.md` | Ubiquitous language for garages, access, and tickets |
 
-Diagrams are [D2](https://d2lang.com) sources in `docs/diagrams/` with rendered
-SVGs — regenerate with `scripts/render_diagrams.sh`.
+Diagrams are D2 sources in `docs/diagrams/` with rendered SVGs. Regenerate them with `scripts/render_diagrams.sh` after editing a `.d2` file. Shared agent skills live in `.agents/skills/`.
 
-## Data and backups
+## Project layout
 
-Close the app before copying the database together with its `-wal` and `-shm`
-companions. For a consistent online backup:
+```text
+src/main/java/com/parking/
+├── config/       Settings file and startup wiring
+├── gui/          Views, shell, theming, and navigation
+├── model/        Domain entities and payment types
+├── enums/        Ticket, payment, spot, and reservation states
+├── exceptions/   Domain and authorization failures
+├── security/     Password hashing and card authorization
+├── services/     Transactions, access checks, and use cases
+├── persistence/  SQLite store and schema migrations
+└── util/         Money and formatting helpers
+```
+
+Tests mirror these packages under `src/test/java`. Themed CSS is generated from Java tokens; edit the tokens and run `mvn generate-resources`.
+
+## Back up and restore
+
+Copy the database with its `-wal` and `-shm` companions after closing the app. For a backup while the app runs, use the SQLite backup command:
 
 ```bash
 sqlite3 "$HOME/.parkingos/parking.db" ".backup '$HOME/.parkingos/parking.db.backup'"
 ```
 
-Startup migrations are versioned and validated — a failed migration aborts
-startup instead of deleting or resetting data. Full procedures:
-`docs/OPERATIONS.md`.
+Migrations are versioned and validated. A failed migration stops startup instead of deleting data, so restore the backup and investigate. Procedures and failure handling live in `docs/OPERATIONS.md`.
 
-## Testing
+## Test it
 
 ```bash
-mvn test                          # full suite (headless, no display needed)
-mvn -Dtest=TicketServiceTest test  # single class
-mvn generate-resources            # regenerate themed CSS from design tokens
+mvn test
+mvn -Dtest=TicketServiceTest test
 ```
 
-## Security
+The suite runs headless with plain JUnit and in-memory SQLite. Only `javafx:run` needs a display. Conventions for new tests live in `docs/TESTING.md`.
 
-- No predictable demo accounts — accounts are created via setup, registration,
-  or admin provisioning; demo fixtures require explicit opt-in.
-- Passwords are stored as hashes; payment flows never persist card numbers,
-  CVV values, or raw passwords.
-- Keep the SQLite database and backup files private.
+## Security model
 
-## Contributing
+- No default accounts ship with the app. You create the first admin at setup, customers self-register, and admins provision the rest. Demo fixtures stay behind an explicit flag.
+- Passwords are stored as hashes. Card numbers and CVV values never reach the database.
+- Garage access is deny by default. Admins hold global scope; everyone else needs an active grant per garage, and archived garages reject all new work.
+- Keep database and backup files private.
 
-See `docs/CONTRIBUTING.md` for the ubiquitous language, module boundaries,
-theming contract, and commit conventions. Contributors run `mvn test` and follow
-conventional commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
+## Contribute
+
+Read `docs/CONTRIBUTING.md` for the ubiquitous language, module boundaries, and commit conventions. Branch from `main`, keep each pull request to one concern, run `mvn test`, and use conventional commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
